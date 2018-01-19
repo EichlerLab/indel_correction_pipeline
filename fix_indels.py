@@ -135,11 +135,11 @@ szCommand = "ln -s " + szFreebayesCorrectedGenome1Fai
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
-szCommand = "cp ~dgordon/pipelines/align_illumina_against_reference/pilon_stage2.snake ."
+szCommand = "cp ~dgordon/pipelines/align_illumina_against_reference/align_illumina_against_reference.snake ."
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
-szConfigJson = "config.json"
+szConfigJson = "align_illumina_against_reference_config.json"
 with open( szConfigJson, "w" ) as fConfig:
     fConfig.write( "{\n     \"assembly\": {\n          \"quivered\": \"" + szFreebayesCorrectedGenome1 + "\"\n     }\n}\n" )
 
@@ -147,7 +147,7 @@ szCommand = "mkdir -p log"
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
-szCommand = "/net/eichler/vol4/home/jlhudd/src/snakemake/bin/snakemake -s pilon_stage2.snake --drmaa \" -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p"
+szCommand = "snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p"
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
@@ -280,7 +280,7 @@ print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
 szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 = szCurrentDirectory + "/outputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1.bed"
-szCommand = "convertCoordinates2.py --szInputHighAndLowDepthBedFile " + szHighAndLowDepthRegionsBedFullPath  + " --szFreebayesVCFFile " + szFilteredFreebayes1VCF + " --szOutputHighAndLowDepthBedFileWithRespectToNewGenome " + szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 + " --szNewGenomeFaiFile " + szFreebayesCorrectedGenome1Fai
+szCommand = "./convertCoordinates2.py --szInputHighAndLowDepthBedFile " + szHighAndLowDepthRegionsBedFullPath  + " --szFreebayesVCFFile " + szFilteredFreebayes1VCF + " --szOutputHighAndLowDepthBedFileWithRespectToNewGenome " + szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 + " --szNewGenomeFaiFile " + szFreebayesCorrectedGenome1Fai
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
