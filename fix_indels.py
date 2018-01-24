@@ -175,7 +175,7 @@ os.chdir( szSmartieOnCorrectedGenome1Subdirectory )
 
 # next run zev's pipeline
 
-szCommand = "cp ~dgordon/smartie/Snakefile_drmaa4 ."
+szCommand = "cp ~dgordon/smartie/smartie.snake ."
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
@@ -208,12 +208,13 @@ with open( szSmartiePipelineConfigCorrectedGenome1, "w" ) as fSmartiePipelineCon
     fSmartiePipelineConfig.write( szQueryLine )
     szFixedPart2 = \
 """           },
+        "blasr_mem" : "10G",
         "processors" : """
     fSmartiePipelineConfig.write( szFixedPart2 )
     fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-szCommand = "mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s Snakefile_drmaa4 --verbose -p"
+szCommand = "mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
 
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
@@ -445,7 +446,7 @@ os.chdir( szSmartieOnCorrectedGenome2Subdirectory )
 print "chdir to "  + szSmartieOnCorrectedGenome2Subdirectory
 
 
-szCommand = "cp ~dgordon/smartie/Snakefile_drmaa4 ."
+szCommand = "cp ~dgordon/smartie/smartie.snake ."
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
@@ -479,12 +480,13 @@ with open( szSmartiePipelineConfigCorrectedGenome2, "w" ) as fSmartiePipelineCon
     fSmartiePipelineConfig.write( szQueryLine )
     szFixedPart2 = \
 """           },
+        "blasr_mem" : "10G",
         "processors" : """
     fSmartiePipelineConfig.write( szFixedPart2 )
     fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-szCommand = "mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s Snakefile_drmaa4 --verbose -p"
+szCommand = "mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
 
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
