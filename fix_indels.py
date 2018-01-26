@@ -351,9 +351,9 @@ with open( szConfig, "w" ) as fConfig:
 with open( "correctedGenome1.bamlist.txt", "w" ) as fBamList:
     fBamList.write( szIlluminaVsFreebayesCorrected1Bam + "\n" )
 
-# create data/correctedGenome1.regions.txt
+# create data/regions.txt
 
-szRegionsFile = "data/correctedGenome1.regions.txt"
+szRegionsFile = "data/regions.txt"
 
 szCommand = "mkdir data"
 print "about to execute: " + szCommand
@@ -375,7 +375,7 @@ szCommand =  "cp ~dgordon/pipelines/running_freebayes_on_regions/run_snakemake.s
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
-szCommand = "run_snakemake.sh"
+szCommand = "module unload python && run_snakemake.sh"
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
