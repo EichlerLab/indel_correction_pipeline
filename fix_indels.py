@@ -252,11 +252,18 @@ print "current directory: " + szCurrentDirectory
 # in /net/eichler/vol20/projects/whole_genome_assembly/nobackups/yoruban/fix_pilon/freebayes_polishing5
 # by run_freebayes_in_these_regions.sh
 
+# finds indels in human coding regions
 szCorrected1GenomeCDS = "hg38-Correct1Genome.cds.bed"
 szCommand = "bedtools intersect -wa -u -a " + szSmartieIndelFileCorrectedGenome1 + " -b " + szHg38CDS + " >" + szCorrected1GenomeCDS
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
+
+# find indels (with respect to human) that are gene-killing (not a
+# multiple of 3) in human coding regions and other filters.  I don't
+# believe there is any guarantee that freebayes will find any Illumina
+# reads that would correct such indels.  But we will try to find such
+# by running freebayes at these locations.
 
 szGeneKillingIndelsInCorrectedGenome1NoSegNoLowConfNoContigEndsNoSmallContigs = "indel.cds.noseg-nolowc-noends-nosmallcontigs.bed"
 
@@ -267,6 +274,8 @@ subprocess.call( szCommand, shell = True )
 szGeneKillingIndelsInCorrectedGenome1NoSegNoLowConfNoContigEndsNoSmallContigsFalconSpace = "indel.cds.noseg-nolowc-noends-nosmallcontigs.falconspace.bed"
 
 # convert to falcon coordinates:
+# (can do this easily because the smartie pipeline gave both human and falcon coordinates
+# for each indel)
 szCommand = "awk 'BEGIN {OFS = \"\t\" } {print $7,$8,$9,$0}' " + szGeneKillingIndelsInCorrectedGenome1NoSegNoLowConfNoContigEndsNoSmallContigs + " | sort -k1,1 -k2,2n >" +  szGeneKillingIndelsInCorrectedGenome1NoSegNoLowConfNoContigEndsNoSmallContigsFalconSpace
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
@@ -279,6 +288,10 @@ subprocess.call( szCommand, shell = True )
 szCommand = "cp ~dgordon/pipelines/freebayes_polishing/convertCoordinates2.py ."
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
+
+# change high/low depth from falcon coordinates *before* this pipeline ran to 
+# falcon coordinate of correctedGenome1 coordinates.  Does this using the vcf file
+# used to make correctedGenome1
 
 szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 = szCurrentDirectory + "/outputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1.bed"
 szCommand = "./convertCoordinates2.py --szInputHighAndLowDepthBedFile " + szHighAndLowDepthRegionsBedFullPath  + " --szFreebayesVCFFile " + szFilteredFreebayes1VCF + " --szOutputHighAndLowDepthBedFileWithRespectToNewGenome " + szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 + " --szNewGenomeFaiFile " + szFreebayesCorrectedGenome1Fai
@@ -336,6 +349,8 @@ assert os.path.isfile( szRunFreebayesInTheseRegions ), szRunFreebayesInTheseRegi
 ###########  end filtering indels in corrected genome 1 ##################
 
 ########### run freebayes at pin-point locations in corrected genome 1 ############
+
+
 
 szConfig = "config.yaml"
 with open( szConfig, "w" ) as fConfig:
@@ -430,6 +445,19 @@ print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
 os.chdir( ".." )
+
+szCommand = "ln -s " + szCorrectedGenome2 + " almost_done.fa"
+print "about to execute: " + szCommand
+subprocess.call( szCommand, shell = True )
+
+szCommand = "module load numpy/1.7.0 && module load biopython/1.63 &&  rename_sequences.py --szInputFasta almost_done.fa --szOutputFasta indel_corrected.fa"
+print "about to execute: " + szCommand
+subprocess.call( szCommand, shell = True )
+
+szCommand = "samtools faidx indel_corrected.fa"
+print "about to execute: " + szCommand
+subprocess.call( szCommand, shell = True )
+
 
 
 ################ done creating correctedGenome2.fa  (In the future, should exclude snps.) ####################
