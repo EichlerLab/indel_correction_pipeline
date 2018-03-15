@@ -1,2 +1,8 @@
-module load python/2.7.3
-fix_indels.py --szInputGenome ~/eee_shared/assemblies/clint_panTro/polished_quivered_masked/clint.contigs.quiver.pilon.masked.fasta --szInputFreebayesVCFFile /net/eichler/vol25/projects/whole_genome_assembly/nobackups/chimp/Drafts/V3.0a-falcon/freebayes_polishing/clint.vcf.gz --szPrefixForSmartie ylint170309 --nProcessors 22 --szIlluminaPiecesForward /net/eichler/vol25/projects/whole_genome_assembly/nobackups/chimp/Drafts/V3.0a-falcon/freebayes_polishing5/illumina_reads/pieces_forward --szHighAndLowDepthRegionsBed high_low_depth_2.7_170_falcon_coordinates.bed
+export PATH=.:$PATH
+source source_this_first.sh
+fix_indels.py --szInputGenome /net/eichler/vol27/projects/assemblies/nobackups/macaque/download_stlouis/macaque.fa \
+--szInputFreebayesVCFFile /net/eichler/vol27/projects/assemblies/nobackups/macaque/initial_freebayes/final/merged.macaque.vcf.gz \
+--szPrefixForSmartie mac180309 \
+--nProcessors 22 \
+--szIlluminaPiecesForward /net/eichler/vol27/projects/assemblies/nobackups/macaque/bwa_illumina_vs_pilond/pieces_forward \
+--szHighAndLowDepthRegionsBed high_low_depth_2.7_99_falcon_coordinates.bed
