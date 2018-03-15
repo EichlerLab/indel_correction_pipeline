@@ -92,7 +92,7 @@ subprocess.call( szCommand, shell = True )
 
 szFreebayesCorrectedGenome1 = szCurrentDirectory + "/" + os.path.basename( args.szInputGenome ) + ".freebayes1.fa"
 
-szCommand = "module load VCFtools/0.1.12b && module load tabix/0.2.6 && tabix " + szFilteredFreebayes1VCF + " && cat " + args.szInputGenome + " | vcf-consensus " + szFilteredFreebayes1VCF + " >" + szFreebayesCorrectedGenome1
+szCommand = "module load zlib/1.2.11 VCFtools/0.1.12b && module load tabix/0.2.6 && tabix " + szFilteredFreebayes1VCF + " && cat " + args.szInputGenome + " | vcf-consensus " + szFilteredFreebayes1VCF + " >" + szFreebayesCorrectedGenome1
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
@@ -141,7 +141,10 @@ subprocess.call( szCommand, shell = True )
 
 szConfigJson = "align_illumina_against_reference_config.json"
 with open( szConfigJson, "w" ) as fConfig:
-    fConfig.write( "{\n     \"assembly\": {\n          \"quivered\": \"" + szFreebayesCorrectedGenome1 + "\"\n     }\n}\n" )
+    fConfig.write( "{\n     \"align_reads_to_this_fasta\": " + "\"" + szFreebayesCorrectedGenome1 + "\",\n     \"tmp_dir\": \"/var/tmp/\" \n}" )
+
+
+
 
 szCommand = "mkdir -p log"
 print "about to execute: " + szCommand
@@ -400,7 +403,7 @@ subprocess.call( szCommand, shell = True )
 szCurrentDirectory = os.getcwd()
 print "current directory: " + szCurrentDirectory
 
-szCommand = "module unload python/2.7.3 && module list && run_snakemake.sh"
+szCommand = "module unload python && module list && run_snakemake.sh"
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
