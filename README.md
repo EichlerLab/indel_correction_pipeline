@@ -1,3 +1,11 @@
+see wiki:
+
+https://eichlerlab.gs.washington.edu/help/wiki/doku.php?id=users:indel_correction_pipeline_using_freebayes
+
+which has more detailed information, especially for the previous
+steps.
+
+
 This pipeline does the following:
 
 
