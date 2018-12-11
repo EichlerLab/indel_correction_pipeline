@@ -135,9 +135,10 @@ szCommand = "ln -s " + szFreebayesCorrectedGenome1Fai
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
-szCommand = "cp ~dgordon/pipelines/align_illumina_against_reference/align_illumina_against_reference.snake ."
-print "about to execute: " + szCommand
-subprocess.call( szCommand, shell = True )
+# now this is part of the git repository
+#szCommand = "cp ~dgordon/pipelines/align_illumina_against_reference/align_illumina_against_reference.snake ."
+#print "about to execute: " + szCommand
+#subprocess.call( szCommand, shell = True )
 
 szConfigJson = "align_illumina_against_reference_config.json"
 with open( szConfigJson, "w" ) as fConfig:
@@ -150,7 +151,7 @@ szCommand = "mkdir -p log"
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
-szCommand = "snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p"
+szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p"
 print "about to execute: " + szCommand
 subprocess.call( szCommand, shell = True )
 
