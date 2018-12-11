@@ -88,13 +88,13 @@ def szGetForwardLittleFastqFromUniqueID( wildcards ):
         elif( nReadNameType == 5 ):
                 szForwardFastq = "pieces_forward/" + szBefore + "_forward.fq" + szAfter
         else:
-                sys.exit( 
+                sys.exit(  "nReadNameType = {:d} but must be 1 to 5".format( nReadNameType ) )
                 
         return szForwardFastq
         
 
 def szGetReverseLittleFastqFromUniqueID( wildcards ):
-        global bFastqNotFq
+
         # SRR3189761_1.fastq003
         # was converted to:
         # SRR3189761_003
@@ -120,9 +120,9 @@ def szGetReverseLittleFastqFromUniqueID( wildcards ):
         elif( nReadNameType == 5 ):
                 szReverseFastq = "pieces_reverse/" + szBefore + "_reverse.fq" + szAfter
         else:
-                sys.exit( 
+                sys.exit(  "nReadNameType = {:d} but must be 1 to 5".format( nReadNameType ) )
                 
-        return szForwardFastq
+        return szReverseFastq
 
 
 
