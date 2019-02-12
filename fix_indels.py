@@ -58,8 +58,8 @@ szSmartieIndelFileCorrectedGenome1 = szCurrentDirectory  + "/" + szSmartieOnCorr
 szSmartieOnCorrectedGenome2Subdirectory  = "smartie_on_correctedGenome2"
 
 szSmartieIndelFileCorrectedGenome2 = szCurrentDirectory + "/" + szSmartieOnCorrectedGenome2Subdirectory + "/variants/hg38-" + args.szPrefixForSmartie + ".2.indel.bed"
-if ( os.path.isfile( szSmartieIndelFileCorrectedGenome2 ) ):
-    sys.exit( szSmartieIndelFileCorrectedGenome2 + " already exists.  Delete it first." )
+#if ( os.path.isfile( szSmartieIndelFileCorrectedGenome2 ) ):
+#    sys.exit( szSmartieIndelFileCorrectedGenome2 + " already exists.  Delete it first." )
 
 ####################################################################
 #####  filter existing freebayes file to yield correctFreebayes1.fa genome
@@ -273,11 +273,15 @@ subprocess.call( szCommand, shell = True )
 
 os.chdir( szRunFreebayesOnCorrection1Genome )
 
+szCurrentDirectory = os.getcwd()
+print "current directory: " + szCurrentDirectory
+
+szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 = szCurrentDirectory + "/outputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1.bed"
+
+
 szWhereToRunFreebayesDoneFlag = "where_to_run_freebayes_done_flag"
 if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
 
-    szCurrentDirectory = os.getcwd()
-    print "current directory: " + szCurrentDirectory
 
 
     # filter the smartie analysis just as in
@@ -327,7 +331,7 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
     # falcon coordinate of correctedGenome1 coordinates.  Does this using the vcf file
     # used to make correctedGenome1
 
-    szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 = szCurrentDirectory + "/outputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1.bed"
+    # szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 = szCurrentDirectory + "/outputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1.bed"
     szCommand = "./convertCoordinates2.py --szInputHighAndLowDepthBedFile " + szHighAndLowDepthRegionsBedFullPath  + " --szFreebayesVCFFile " + szFilteredFreebayes1VCF + " --szOutputHighAndLowDepthBedFileWithRespectToNewGenome " + szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 + " --szNewGenomeFaiFile " + szFreebayesCorrectedGenome1Fai
     print "about to execute: " + szCommand
     subprocess.call( szCommand, shell = True )
