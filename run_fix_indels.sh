@@ -1,8 +1,7 @@
 export PATH=.:$PATH
 source source_this_first.sh
-fix_indels.py --szInputGenome /net/eichler/vol27/projects/assemblies/nobackups/macaque/download_stlouis/macaque.fa \
---szInputFreebayesVCFFile /net/eichler/vol27/projects/assemblies/nobackups/macaque/initial_freebayes/final/merged.macaque.vcf.gz \
---szPrefixForSmartie mac180309 \
+fix_indels_start_earlier.py --szInputGenome /net/eichler/vol27/projects/autism_genome_assembly/nobackups/assemblies/proband/squashed_pilon/squashed_arrowed_piloned.fa \
+--szPrefixForSmartie mother190515 \
 --nProcessors 22 \
---szIlluminaPiecesForward /net/eichler/vol27/projects/assemblies/nobackups/macaque/bwa_illumina_vs_pilond/pieces_forward \
---szHighAndLowDepthRegionsBed high_low_depth_2.7_99_falcon_coordinates.bed
+--szIlluminaPiecesForward /net/eichler/vol27/projects/autism_genome_assembly/nobackups/assemblies/proband/illumina_reads/cram_to_fasta/fastqs/pieces_forward \
+--szHighAndLowDepthRegionsBed /net/eichler/vol27/projects/autism_genome_assembly/nobackups/assemblies/proband/squashed_indel/read_depth_by_position/high_and_low_depth_regions.bed
