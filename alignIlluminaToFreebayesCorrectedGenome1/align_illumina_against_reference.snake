@@ -10,7 +10,7 @@ SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 shell.prefix(". {SNAKEMAKE_DIR}/config.sh; set -eo pipefail ; module load bwa/0.7.13; module load samtools/1.3;"  )
 
 configfile: "align_illumina_against_reference_config.json"
-TMP_DIR = config["tmp_dir"]
+TMP_DIR = "$TMPDIR/"
 szAssembly = config["align_reads_to_this_fasta"]
 
 
