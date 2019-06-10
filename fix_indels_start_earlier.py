@@ -135,7 +135,7 @@ if ( not os.path.exists( szBwaVsInputGenomeDoneFlag )):
     os.chdir( dirBwaVsInputGenome )
 
     # cloning into the current directory
-    szCommand = "module list && git clone git@github.com:dgordon562/align_illumina_against_reference.git ."
+    szCommand = "module list && rm -rf log && rm -rf .git && rm -f * && git clone git@github.com:dgordon562/align_illumina_against_reference.git ."
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
