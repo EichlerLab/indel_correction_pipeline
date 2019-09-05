@@ -1,6 +1,6 @@
 module purge
 module load modules modules-init modules-gs/prod modules-eichler/prod 
-module load anaconda/201710
+module load miniconda/4.5.12
 module load python/2.7.3
 module load perl/5.14.2
 module load zlib/1.2.11
