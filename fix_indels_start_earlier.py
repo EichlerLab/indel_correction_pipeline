@@ -28,22 +28,25 @@ nMinimumSizeContig = 500000
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--szInputGenome", help="can be full path or in current directory", required = True )
+parser.add_argument("--szInputGenome", help="must be full path for read_depth pipeline", required = True )
 parser.add_argument("--szPrefixForSmartie", help="just so it is unique across genomes", required = True )
 parser.add_argument( "--nProcessors", help="number of cpus on a node that has 60G available", required = True, type = int )
 parser.add_argument( "--szIlluminaPiecesForward", help="should end with pieces_forward   Replacing pieces_forward by pieces_reverse should give the reverse directory", required = True )
-parser.add_argument( "--szHighAndLowDepthRegionsBed", help="I guess in pilon coordinates so a problem", required = True )
+parser.add_argument( "--szPacBioReadsFof", help="to calculate read depth profile and find too high and too low read depth", required = True )
 
 args = parser.parse_args()
 
 
-assert os.path.exists( args.szHighAndLowDepthRegionsBed ), "parameter --szHighAndLowDepthRegionsBed " + args.szHighAndLowDepthRegionsBed + " does not exist"
-# I will be using this in a subdirectory so I want it as an absolute path
+# assert os.path.exists( args.szHighAndLowDepthRegionsBed ), "parameter --szHighAndLowDepthRegionsBed " + args.szHighAndLowDepthRegionsBed + " does not exist"
+# # I will be using this in a subdirectory so I want it as an absolute path
 
-szCommand = "readlink -f --no-newline " + args.szHighAndLowDepthRegionsBed 
-print "about to execute: " + szCommand
-szHighAndLowDepthRegionsBedFullPath = subprocess.check_output( szCommand, shell = True )
-assert os.path.exists( szHighAndLowDepthRegionsBedFullPath ), "full path " + szHighAndLowDepthRegionsBedFullPath + " didn't exist"
+# szCommand = "readlink -f --no-newline " + args.szHighAndLowDepthRegionsBed 
+# print "about to execute: " + szCommand
+# szHighAndLowDepthRegionsBedFullPath = subprocess.check_output( szCommand, shell = True )
+# assert os.path.exists( szHighAndLowDepthRegionsBedFullPath ), "full path " + szHighAndLowDepthRegionsBedFullPath + " didn't exist"
+
+
+
 
 
 szCurrentDirectory = os.getcwd()
@@ -62,7 +65,59 @@ szSmartieIndelFileCorrectedGenome2 = szCurrentDirectory + "/" + szSmartieOnCorre
 #    sys.exit( szSmartieIndelFileCorrectedGenome2 + " already exists.  Delete it first." )
 
 
-dirBwaVsInputGenome = "bwa_vs_input_genome"
+
+####################################################################
+#####  align pacbio reads against input genome
+
+
+dirPacBioReadDepthByPosition = "read_depth_by_position"
+szCommand = "mkdir -p " + dirPacBioReadDepthByPosition
+print "about to execute: " + szCommand
+subprocess.check_call( szCommand, shell = True )
+
+
+szPacBioReadDepthByPositionDone = dirPacBioReadDepthByPosition + "/read_depth_by_position_done"
+if ( not os.path.exists( szPacBioReadDepthByPositionDone )):
+
+    os.chdir( dirPacBioReadDepthByPosition )
+
+    szCommand = "git clone git@github.com:EichlerLab/read_depth_by_position.git"
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+    os.chdir( "read_depth_by_position" )
+
+    with open( "config.json", "w" ) as fConfig:
+        fConfig.write( "{\n" )
+        fConfig.write( "    \"fasta_to_align_reads_to\": \"" + args.szInputGenome + "\",\n" )
+        fConfig.write( "    \"mmi_index_to_align_reads_to\" : \"" + args.szInputGenome + ".mmi\",\n" )
+        fConfig.write( "    \"fasta_fofn\": \"" + args.szPacBioReadsFof + "\",\n" )
+        fConfig.write( "    \"cluster_settings\" : {\n" )
+        fConfig.write( "        \"heavy\" : \"-l h_rt=48:00:00 -l mfree=20G -q eichler-short.q -l disk_free=20G\"\n" )
+        fConfig.write( "         }\n" )
+        fConfig.write( "}\n" )
+
+
+
+    szCommand = "run_calculate_read_depth.sh"
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+    os.chdir( szTopLevelDirectory )
+
+    szCommand = "touch " + szPacBioReadDepthByPositionDone
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+
+szHighAndLowDepthRegionsFalconCoordsBedFullPath = szTopLevelDirectory + "/" + dirPacBioReadDepthByPosition + "/read_depth_by_position/high_and_low_depth_regions.bed"
+assert os.path.exists( szHighAndLowDepthRegionsFalconCoordsBedFullPath ), "looking for " + szHighAndLowDepthRegionsFalconCoordsBedFullPath
+    
+
+
+
+
+dirBwaVsInputGenome = szTopLevelDirectory + "/bwa_vs_input_genome"
 szCommand = "mkdir -p " + dirBwaVsInputGenome
 print "about to execute: " + szCommand
 subprocess.check_call( szCommand, shell = True )
@@ -71,17 +126,54 @@ subprocess.check_call( szCommand, shell = True )
 #####  bwa align Illumina reads against input genome
 
 
-szBamOfBwaVsInputGenome = szTopLevelDirectory + "/" + dirBwaVsInputGenome + "/illumina_vs_input_genome.sorted.bam"
+# must match name as specified in align_illumina_against_reference pipeline
+szBamOfBwaVsInputGenome = dirBwaVsInputGenome + "/illumina_vs_assembly.sorted.bam"
 
 szBwaVsInputGenomeDoneFlag = dirBwaVsInputGenome + "/bwa_vs_input_genome_done"
 if ( not os.path.exists( szBwaVsInputGenomeDoneFlag )):
 
-    # run bwa here--needs to be added
+    os.chdir( dirBwaVsInputGenome )
 
+    # cloning into the current directory
+    szCommand = "module list && rm -rf log && rm -rf .git && rm -f * && git clone git@github.com:dgordon562/align_illumina_against_reference.git ."
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+    
+    # set up links to pieces_forward and pieces_reverse of Illumina reads
+
+    szCommand = "ln -s -f " + args.szIlluminaPiecesForward
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+    szIlluminaPiecesReverse = re.sub( r"pieces_forward", "pieces_reverse", args.szIlluminaPiecesForward )
+
+    szCommand = "ln -s -f " + szIlluminaPiecesReverse
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+    szConfigJson = "align_illumina_against_reference_config.json"
+    with open( szConfigJson, "w" ) as fConfig:
+        fConfig.write( "{\n     \"align_reads_to_this_fasta\": " + "\"" + args.szInputGenome + "\",\n     \"tmp_dir\": \"/var/tmp/\" \n}" )
+
+
+    szCommand = "mkdir -p log"
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=4:00:00:00 -V -cwd -e ./log -o ./log {params.sge_opts} -S /bin/bash\" -w 300 --jobs 100 -p"
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+    szBamBaiOfBwaVsInputGenome =  szBamOfBwaVsInputGenome + ".bai"
+    assert os.path.exists( szBamOfBwaVsInputGenome ), szBamOfBwaVsInputGenome + " must exist at this point but doesn't"
+    assert os.path.exists( szBamBaiOfBwaVsInputGenome ), szBamBaiOfBwaVsInputGenome + " must exist at this point but doesn't"
 
     szCommand = "touch " + szBwaVsInputGenomeDoneFlag
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
+
+    os.chdir( szTopLevelDirectory )
 
 ####################################################################
 #####  run freebayes using bwa alignments of illumina reads against input genome
@@ -242,8 +334,6 @@ if ( not os.path.isfile( szAlignDoneFlag ) ):
     szConfigJson = "align_illumina_against_reference_config.json"
     with open( szConfigJson, "w" ) as fConfig:
         fConfig.write( "{\n     \"align_reads_to_this_fasta\": " + "\"" + szFreebayesCorrectedGenome1 + "\",\n     \"tmp_dir\": \"/var/tmp/\" \n}" )
-
-
 
 
     szCommand = "mkdir -p log"
@@ -414,10 +504,9 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
     # used to make correctedGenome1
 
     # szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 = szCurrentDirectory + "/outputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1.bed"
-    szCommand = "./convertCoordinates2.py --szInputHighAndLowDepthBedFile " + szHighAndLowDepthRegionsBedFullPath  + " --szFreebayesVCFFile " + szFilteredFreebayes1VCF + " --szOutputHighAndLowDepthBedFileWithRespectToNewGenome " + szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 + " --szNewGenomeFaiFile " + szFreebayesCorrectedGenome1Fai
+    szCommand = "./convertCoordinates2.py --szInputHighAndLowDepthBedFile " + szHighAndLowDepthRegionsFalconCoordsBedFullPath  + " --szFreebayesVCFFile " + szFilteredFreebayes1VCF + " --szOutputHighAndLowDepthBedFileWithRespectToNewGenome " + szOutputHighAndLowDepthBedFileWithRespectToFreebayesCorrectedGenome1 + " --szNewGenomeFaiFile " + szFreebayesCorrectedGenome1Fai
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
-
 
     szFilteredGeneKillingIndels = "for_david_final.repair.bed"
 
