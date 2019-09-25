@@ -369,16 +369,7 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
     subprocess.check_call( szCommand, shell = True )
 
     os.chdir( szSmartieOnCorrectedGenome1Subdirectory )
-
-    # next run zev's pipeline
-
-    szCommand = "cp ~dgordon/smartie/smartie.snake ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
-
-    szCommand = "cp ~dgordon/smartie/smartie-sv/pipeline/config.sh ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
+    print "chdir to "  + szSmartieOnCorrectedGenome1Subdirectory
 
 
     szSmartiePipelineConfigCorrectedGenome1 = "config.json"
@@ -388,9 +379,8 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
         szFixedPart1 = \
     """\
     {
-            "install" :"/net/eichler/vol20/projects/whole_genome_assembly/nobackups/yoruban/fix_pilon/zev_pipe/smartie-sv",
             "targets" : {
-                      "hg38" : "/net/eichler/vol2/eee_shared/assemblies/hg38/indexes/blasr/ucsc.hg38.no_alts.fasta"
+                      "hg38" : "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/indexes/blasr/ucsc.hg38.no_alts.fasta"
                       },
             "queries" : {
     """
@@ -400,21 +390,21 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
         szQueryLine += args.szPrefixForSmartie 
         szQueryLine += ".1"
         szQueryLine += "\" : \"" 
-        szQueryLine += szFreebayesCorrectedGenome1 
+        szQueryLine += szFreebayesCorrectedGenome1
         szQueryLine += "\"\n"
         fSmartiePipelineConfig.write( szQueryLine )
         szFixedPart2 = \
     """           },
-            "blasr_mem" : "10G",
-            "processors" : """
+            "n_proc" : """
         fSmartiePipelineConfig.write( szFixedPart2 )
         fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-    szCommand = "module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
+    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -V -cwd -j y -o ./log -l {cluster.h_rt} -l {cluster.mfree} -pe {cluster.pe} -q {cluster.q} -w n -S /bin/bash\" --verbose -p"
 
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
+
 
     # get the indel file from "variants"
 
