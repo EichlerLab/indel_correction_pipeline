@@ -16,11 +16,11 @@ nHowFarToLookForCorrelatedIndels = 6
 
 szSmartiePipelineDir = "/net/eichler/vol20/projects/whole_genome_assembly/nobackups/yoruban/fix_pilon/zev_pipe/smartie-sv/pipeline"
 
-szHg38CDS = "/net/eichler/vol2/eee_shared/assemblies/hg38/genes/refGene.CDS_exons.bed"
+szHg38CDS = "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/genes/refGene.CDS_exons.bed"
 
 szHg38LowConfidenceRegions = "~dgordon/pipelines/indel_correction_pipeline/hg38_low_confidence_regions.bed"
 
-szHg38WgacSuperDup = "/net/eichler/vol2/eee_shared/assemblies/hg38/wgac/genomicSuperDup.sort.bed.gz"
+szHg38WgacSuperDup = "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/wgac/genomicSuperDup.sort.bed.gz"
 
 nHowCloseToEnds = 10000
 
@@ -411,7 +411,7 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
         fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-    szCommand = "module purge && module load modules modules-init modules-gs/prod modules-eichler/prod anaconda/201710 && module list && mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
+    szCommand = "module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
 
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
@@ -699,26 +699,14 @@ if ( not os.path.isfile( szSmartieOnCorrectedGenome2Done ) ):
     print "chdir to "  + szSmartieOnCorrectedGenome2Subdirectory
 
 
-    szCommand = "cp ~dgordon/smartie/smartie.snake ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
-
-
-    szCommand = "cp ~dgordon/smartie/smartie-sv/pipeline/config.sh ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
-
-
-
     szSmartiePipelineConfigCorrectedGenome2 = "config.json"
 
     with open( szSmartiePipelineConfigCorrectedGenome2, "w" ) as fSmartiePipelineConfig:
         szFixedPart1 = \
     """\
     {
-            "install" :"/net/eichler/vol20/projects/whole_genome_assembly/nobackups/yoruban/fix_pilon/zev_pipe/smartie-sv",
             "targets" : {
-                      "hg38" : "/net/eichler/vol2/eee_shared/assemblies/hg38/indexes/blasr/ucsc.hg38.no_alts.fasta"
+                      "hg38" : "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/indexes/blasr/ucsc.hg38.no_alts.fasta"
                       },
             "queries" : {
     """
@@ -733,13 +721,12 @@ if ( not os.path.isfile( szSmartieOnCorrectedGenome2Done ) ):
         fSmartiePipelineConfig.write( szQueryLine )
         szFixedPart2 = \
     """           },
-            "blasr_mem" : "10G",
-            "processors" : """
+            "n_proc" : """
         fSmartiePipelineConfig.write( szFixedPart2 )
         fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-    szCommand = "module purge && module load modules modules-init modules-gs/prod modules-eichler/prod anaconda/201710 && module list && mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
+    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -V -cwd -j y -o ./log -l {cluster.h_rt} -l {cluster.mfree} -pe {cluster.pe} -q {cluster.q} -w n -S /bin/bash\" --verbose -p"
 
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
