@@ -805,6 +805,15 @@ szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2
 print "about to execute: " + szCommand
 subprocess.check_call( szCommand, shell = True )
 
+szCommand = "cat  \"number of filtered gene-killing indels:\" >gene_killing_indels.txt"
+print "about to execute: " + szCommand
+subprocess.check_call( szCommand, shell = True )
+
+szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2 + " >>gene_killing_indels.txt"
+print "about to execute: " + szCommand
+subprocess.check_call( szCommand, shell = True )
+
+
 
 
 
