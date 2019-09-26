@@ -670,7 +670,7 @@ if ( not os.path.isfile( szIndelCorrectedDoneFlag ) ):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "module load numpy/1.7.0 && module load biopython/1.63 &&  rename_sequences.py --szInputFasta almost_done.fa --szOutputFasta indel_corrected.fa"
+    szCommand = "module load python/2.7.3 && module load numpy/1.7.0 && module load biopython/1.63 &&  ./rename_sequences.py --szInputFasta almost_done.fa --szOutputFasta indel_corrected.fa"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
