@@ -674,6 +674,11 @@ if ( not os.path.isfile( szIndelCorrectedDoneFlag ) ):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
+    szCommand = "chmod a-w indel_corrected.fa"
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
+
     szCommand = "samtools faidx indel_corrected.fa"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
