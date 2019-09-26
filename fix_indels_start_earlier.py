@@ -68,7 +68,7 @@ szSmartieIndelFileCorrectedGenome2 = szCurrentDirectory + "/" + szSmartieOnCorre
 
 ####################################################################
 #####  align pacbio reads against input genome
-
+print "\nAligning pacbio reads against input genome\n"
 
 dirPacBioReadDepthByPosition = "read_depth_by_position"
 szCommand = "mkdir -p " + dirPacBioReadDepthByPosition
@@ -124,6 +124,7 @@ subprocess.check_call( szCommand, shell = True )
 
 ####################################################################
 #####  bwa align Illumina reads against input genome
+print "\nbwa align Illumina reads against input genome\n"
 
 
 # must match name as specified in align_illumina_against_reference pipeline
@@ -178,6 +179,10 @@ if ( not os.path.exists( szBwaVsInputGenomeDoneFlag )):
 ####################################################################
 #####  run freebayes using bwa alignments of illumina reads against input genome
 
+print "\nrun freebayes using bwa alignments of illumina reads against input genome\n"
+
+
+
 dirRunFreebayesOnInputGenome = "run_freebayes_on_input_genome"
 
 szCommand = "mkdir -p " + dirRunFreebayesOnInputGenome
@@ -224,6 +229,8 @@ assert( os.path.exists( szFreebayesOnInputGenomeFullPath ) )
 
 ####################################################################
 #####  filter existing freebayes file to yield correctFreebayes1.fa genome
+
+print "\nrun freebayes using bwa alignments of illumina reads against input genome\n"
 
 szFreebayesCorrection1 = "freebayes_correction1"
 szCommand = "mkdir -p " + szFreebayesCorrection1
@@ -289,9 +296,9 @@ if ( not os.path.exists( szDoneFlag ) ):
     os.chdir( ".." )
 
 ########## aligning reads ###############
-
-
 # in prepartion for running freebayes, align illumina reads to szFreebayesCorrectedGenome1
+
+print "\nin prepartion for running freebayes, align illumina reads to szFreebayesCorrectedGenome1\n"
 
 szAlignIlluminaSubdirectory  = "alignIlluminaToFreebayesCorrectedGenome1"
 szAlignDoneFlag =  "alignIlluminaToFreebayesCorrectedGenome1/alignment_done"
@@ -361,6 +368,9 @@ if ( not os.path.isfile( szAlignDoneFlag ) ):
 
 ########### run smartie pipeline on corrected genome1 ##############
 
+print "\nrun smartie pipeline on corrected genome1\n"
+
+
 szSmartie1DoneFlag = szSmartieOnCorrectedGenome1Subdirectory + "/smartie1_done_flag"
 if ( not os.path.isfile( szSmartie1DoneFlag ) ):
 
@@ -423,6 +433,8 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
 
 # prepare to run freebayes on the problem locations of corrected1 genome
 # to get the problem locations, filter the smartie output
+
+print "\nprepare to run freebayes on the problem locations of corrected1 genome to get the problem locations, filter the smartie output\n"
 
 szRunFreebayesOnCorrection1Genome = "run_freebayes_on_corrected1_genome"
 
@@ -547,6 +559,8 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
 
 ########### run freebayes at pin-point locations in corrected genome 1 ############
 
+print "\nrun freebayes at pin-point locations in corrected genome 1\n"
+
 szFreebayesVCFOnCorrectedGenome1 = szCurrentDirectory + "/final/merged.vcf.gz"
 
 szRunFreebayesDoneFlag = "run_freebayes_done_flag"
@@ -607,7 +621,7 @@ os.chdir( ".." )
 
 
 ####################   create correctedGenome2.fa, our final genome ##########################
-
+print "\ncreate correctedGenome2.fa, our final genome\n"
 
 szCorrectedGenome2Dir = "freebayes_correction2"
 
@@ -674,6 +688,7 @@ if ( not os.path.isfile( szIndelCorrectedDoneFlag ) ):
 
 ################   run smartie pipeline again to see how many gene-killing indels remain ##########################################################
 
+print "\nrun smartie pipeline again to see how many gene-killing indels remain\n"
 
 
 
@@ -733,7 +748,10 @@ if ( not os.path.isfile( szSmartieOnCorrectedGenome2Done ) ):
 # end run smartie pipeline again to see how many gene-killing indels remain
 ##########################################################################
 
+
+
 # now filter the smartie indels and see how many remain
+print "\nnow filter the smartie indels and see how many remain\n"
 
 szCorrected2GenomeCDS = "hg38-Correct2Genome.cds.bed"
 szCommand = "bedtools intersect -wa -u -a " + szSmartieIndelFileCorrectedGenome2 + " -b " + szHg38CDS + " >" + szCorrected2GenomeCDS
