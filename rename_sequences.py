@@ -24,6 +24,7 @@ with open( args.szInputFasta, "r" ) as fInput, open( args.szOutputFasta, "w" ) a
 
         szNewName = re.sub( "_1_", "_", szOldName )
         szNewName = re.sub( "_quiver_pilon", "_qpd", szNewName )
+        szNewName = re.sub( "_arrow_pilon",  "_qpd", szNewName )
         szNewName = re.sub( "_qp", "_qpd", szNewName )
     
         record.id = szNewName
