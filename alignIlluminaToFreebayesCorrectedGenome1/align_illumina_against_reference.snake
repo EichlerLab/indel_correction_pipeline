@@ -149,18 +149,10 @@ rule makeBamBai:
 		print( "about to execute: " + szCommand )
 		shell( szCommand )
 
-
-rule sortBamFile:
-	input: "illumina_vs_assembly.bam"
-	output: protected( "illumina_vs_assembly.sorted.bam" )
-	params: sge_opts="-R y -pe serial 10 -l mfree=5G -l h_rt=150:00:00 -q eichler-short.q"
-	run:
-		szCommand = "samtools sort " + str( input ) + " -@ 16 -T " + TMP_DIR + " -o " + str( output )
-		print( "about to execute: " + szCommand )
-		shell( szCommand )
+# no need to explicitly sort--samtools merge does that
 
 rule combineBamFiles:
-	output: "illumina_vs_assembly.bam"
+	output: protected( "illumina_vs_assembly.sorted.bam" )
 	input: expand( "pieces_bam/{uniqueID}.sorted.bam", uniqueID = aUniqueIDs )
 	params: sge_opts="-R y -l mfree=80G -l h_rt=144:00:00 -q eichler-short.q"
 	run:
