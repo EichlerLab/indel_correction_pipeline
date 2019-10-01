@@ -798,18 +798,19 @@ szRemainingIndelsCorrectedGenome2 = "pairs_of_indels_removed4.bed"
 
 assert os.path.isfile( szRemainingIndelsCorrectedGenome2 ), szRemainingIndelsCorrectedGenome2 + " must exist at this point but doesn't"
 
-print "number of filtered gene-killing indels:"
-szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2
-print "about to execute: " + szCommand
-subprocess.check_call( szCommand, shell = True )
+# this is now subsumed by /find_nongenekilling_indels4.py
+# print "number of filtered gene-killing indels:"
+# szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2
+# print "about to execute: " + szCommand
+# subprocess.check_call( szCommand, shell = True )
 
-szCommand = "cat  \"number of filtered gene-killing indels:\" >gene_killing_indels.txt"
-print "about to execute: " + szCommand
-subprocess.check_call( szCommand, shell = True )
+# szCommand = "echo  \"number of filtered gene-killing indels:\" >gene_killing_indels.txt"
+# print "about to execute: " + szCommand
+# subprocess.check_call( szCommand, shell = True )
 
-szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2 + " >>gene_killing_indels.txt"
-print "about to execute: " + szCommand
-subprocess.check_call( szCommand, shell = True )
+# szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2 + " >>gene_killing_indels.txt"
+# print "about to execute: " + szCommand
+# subprocess.check_call( szCommand, shell = True )
 
 
 
