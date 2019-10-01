@@ -78,3 +78,9 @@ print "nNumberOfNonGeneKillingDoubleInsOrDoubleDelEvents = {:d}".format( nNumber
 print "nNumberOfNonGeneKillingInsDelPairedEvents = {:d}".format( nNumberOfNonGeneKillingInsDelPairedEvents )
 print "nNumberOfGeneKillingEventsRemaining = {:d}".format( nNumberOfGeneKillingEventsRemaining )
 
+with open( "summary.txt", "w" ) as fSummary:
+    fSummary.write( "nNumberOfNonGeneKillingDoubleInsOrDoubleDelEvents = {:d}\n".format( nNumberOfNonGeneKillingDoubleInsOrDoubleDelEvents ) )
+    fSummary.write( "nNumberOfNonGeneKillingInsDelPairedEvents = {:d}\n".format( nNumberOfNonGeneKillingInsDelPairedEvents ) )
+    fSummary.write( "nNumberOfGeneKillingEventsRemaining = {:d}\n".format( nNumberOfGeneKillingEventsRemaining ) )
+
+    
