@@ -23,8 +23,12 @@ with open( args.szInputFasta, "r" ) as fInput, open( args.szOutputFasta, "w" ) a
         szOldName = record.id
 
         szNewName = re.sub( "_1_", "_", szOldName )
-        szNewName = re.sub( "_quiver_pilon", "_qpd", szNewName )
-        szNewName = re.sub( "_qp", "_qpd", szNewName )
+        if ( "_quiver_pilon" in szNewName ):
+            szNewName = re.sub( "_quiver_pilon", "_qpd", szNewName )
+        elif( "_arrow_pilon" in szNewName ):
+            szNewName = re.sub( "_arrow_pilon",  "_qpd", szNewName )
+        elif( ("_qp" in szNewName ) and ( _qpd not in szNewName ) ):
+            szNewName = re.sub( "_qp", "_qpd", szNewName )
     
         record.id = szNewName
         record.description = ''

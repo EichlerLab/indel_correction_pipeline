@@ -34,7 +34,7 @@ for szFile in glob.glob( "pieces_forward/*" ):
         aForwardFiles.append( szFile )
         aSamFiles.append( szFile + ".sam" )
         if( "forwards.fastq" in szFile ):
-                szUniqueID = re.sub( "forwards.fastq", "", szFile )
+                szUniqueID = re.sub( "forwards.fastq", "_", szFile )
                 nReadNameType = 1
         elif ( "_1.fastq" in szFile ):
                 szUniqueID = re.sub( r"_1.fastq", "_", szFile )
@@ -78,7 +78,7 @@ def szGetForwardLittleFastqFromUniqueID( wildcards ):
 
 
         if ( nReadNameType == 1 ):
-                szForwardFastq = "pieces_forward/forwards.fastq" + szUniqueID
+                szForwardFastq = "pieces_forward/" + szBefore + "forwards.fastq" + szAfter
         elif( nReadNameType == 2 ):
                 szForwardFastq = "pieces_forward/" + szBefore + "_1.fastq" + szAfter
         elif( nReadNameType == 3 ):
@@ -110,7 +110,7 @@ def szGetReverseLittleFastqFromUniqueID( wildcards ):
 
 
         if ( nReadNameType == 1 ):
-                szReverseFastq = "pieces_reverse/reverses.fastq" + szUniqueID
+                szReverseFastq = "pieces_reverse/" + szBefore + "reverses.fastq" + szAfter
         elif( nReadNameType == 2 ):
                 szReverseFastq = "pieces_reverse/" + szBefore + "_2.fastq" + szAfter
         elif( nReadNameType == 3 ):
@@ -149,18 +149,10 @@ rule makeBamBai:
 		print( "about to execute: " + szCommand )
 		shell( szCommand )
 
-
-rule sortBamFile:
-	input: "illumina_vs_assembly.bam"
-	output: protected( "illumina_vs_assembly.sorted.bam" )
-	params: sge_opts="-R y -pe serial 10 -l mfree=5G -l h_rt=150:00:00 -q eichler-short.q"
-	run:
-		szCommand = "samtools sort " + str( input ) + " -@ 16 -T " + TMP_DIR + " -o " + str( output )
-		print( "about to execute: " + szCommand )
-		shell( szCommand )
+# no need to explicitly sort--samtools merge does that
 
 rule combineBamFiles:
-	output: "illumina_vs_assembly.bam"
+	output: protected( "illumina_vs_assembly.sorted.bam" )
 	input: expand( "pieces_bam/{uniqueID}.sorted.bam", uniqueID = aUniqueIDs )
 	params: sge_opts="-R y -l mfree=80G -l h_rt=144:00:00 -q eichler-short.q"
 	run:

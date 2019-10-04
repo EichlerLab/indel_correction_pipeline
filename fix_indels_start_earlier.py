@@ -14,13 +14,11 @@ nRunFreebayesPlusMinusThisDistanceFromGenekillingIndels = 100
  
 nHowFarToLookForCorrelatedIndels = 6
 
-szSmartiePipelineDir = "/net/eichler/vol20/projects/whole_genome_assembly/nobackups/yoruban/fix_pilon/zev_pipe/smartie-sv/pipeline"
-
-szHg38CDS = "/net/eichler/vol2/eee_shared/assemblies/hg38/genes/refGene.CDS_exons.bed"
+szHg38CDS = "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/genes/refGene.CDS_exons.bed"
 
 szHg38LowConfidenceRegions = "~dgordon/pipelines/indel_correction_pipeline/hg38_low_confidence_regions.bed"
 
-szHg38WgacSuperDup = "/net/eichler/vol2/eee_shared/assemblies/hg38/wgac/genomicSuperDup.sort.bed.gz"
+szHg38WgacSuperDup = "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/wgac/genomicSuperDup.sort.bed.gz"
 
 nHowCloseToEnds = 10000
 
@@ -68,7 +66,7 @@ szSmartieIndelFileCorrectedGenome2 = szCurrentDirectory + "/" + szSmartieOnCorre
 
 ####################################################################
 #####  align pacbio reads against input genome
-
+print "\nAligning pacbio reads against input genome\n"
 
 dirPacBioReadDepthByPosition = "read_depth_by_position"
 szCommand = "mkdir -p " + dirPacBioReadDepthByPosition
@@ -124,6 +122,7 @@ subprocess.check_call( szCommand, shell = True )
 
 ####################################################################
 #####  bwa align Illumina reads against input genome
+print "\nbwa align Illumina reads against input genome\n"
 
 
 # must match name as specified in align_illumina_against_reference pipeline
@@ -161,7 +160,7 @@ if ( not os.path.exists( szBwaVsInputGenomeDoneFlag )):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=4:00:00:00 -V -cwd -e ./log -o ./log {params.sge_opts} -S /bin/bash\" -w 300 --jobs 100 -p"
+    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=4:00:00:00 -V -cwd -e ./log -o ./log {params.sge_opts} -S /bin/bash\" -w 300 --jobs 100 -p -k --rerun"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -177,6 +176,10 @@ if ( not os.path.exists( szBwaVsInputGenomeDoneFlag )):
 
 ####################################################################
 #####  run freebayes using bwa alignments of illumina reads against input genome
+
+print "\nrun freebayes using bwa alignments of illumina reads against input genome\n"
+
+
 
 dirRunFreebayesOnInputGenome = "run_freebayes_on_input_genome"
 
@@ -224,6 +227,8 @@ assert( os.path.exists( szFreebayesOnInputGenomeFullPath ) )
 
 ####################################################################
 #####  filter existing freebayes file to yield correctFreebayes1.fa genome
+
+print "\nrun freebayes using bwa alignments of illumina reads against input genome\n"
 
 szFreebayesCorrection1 = "freebayes_correction1"
 szCommand = "mkdir -p " + szFreebayesCorrection1
@@ -289,9 +294,9 @@ if ( not os.path.exists( szDoneFlag ) ):
     os.chdir( ".." )
 
 ########## aligning reads ###############
-
-
 # in prepartion for running freebayes, align illumina reads to szFreebayesCorrectedGenome1
+
+print "\nin prepartion for running freebayes, align illumina reads to szFreebayesCorrectedGenome1\n"
 
 szAlignIlluminaSubdirectory  = "alignIlluminaToFreebayesCorrectedGenome1"
 szAlignDoneFlag =  "alignIlluminaToFreebayesCorrectedGenome1/alignment_done"
@@ -340,7 +345,7 @@ if ( not os.path.isfile( szAlignDoneFlag ) ):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p"
+    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p -k --rerun"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -361,6 +366,9 @@ if ( not os.path.isfile( szAlignDoneFlag ) ):
 
 ########### run smartie pipeline on corrected genome1 ##############
 
+print "\nrun smartie pipeline on corrected genome1\n"
+
+
 szSmartie1DoneFlag = szSmartieOnCorrectedGenome1Subdirectory + "/smartie1_done_flag"
 if ( not os.path.isfile( szSmartie1DoneFlag ) ):
 
@@ -369,16 +377,7 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
     subprocess.check_call( szCommand, shell = True )
 
     os.chdir( szSmartieOnCorrectedGenome1Subdirectory )
-
-    # next run zev's pipeline
-
-    szCommand = "cp ~dgordon/smartie/smartie.snake ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
-
-    szCommand = "cp ~dgordon/smartie/smartie-sv/pipeline/config.sh ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
+    print "chdir to "  + szSmartieOnCorrectedGenome1Subdirectory
 
 
     szSmartiePipelineConfigCorrectedGenome1 = "config.json"
@@ -388,9 +387,8 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
         szFixedPart1 = \
     """\
     {
-            "install" :"/net/eichler/vol20/projects/whole_genome_assembly/nobackups/yoruban/fix_pilon/zev_pipe/smartie-sv",
             "targets" : {
-                      "hg38" : "/net/eichler/vol2/eee_shared/assemblies/hg38/indexes/blasr/ucsc.hg38.no_alts.fasta"
+                      "hg38" : "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/indexes/blasr/ucsc.hg38.no_alts.fasta"
                       },
             "queries" : {
     """
@@ -400,21 +398,21 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
         szQueryLine += args.szPrefixForSmartie 
         szQueryLine += ".1"
         szQueryLine += "\" : \"" 
-        szQueryLine += szFreebayesCorrectedGenome1 
+        szQueryLine += szFreebayesCorrectedGenome1
         szQueryLine += "\"\n"
         fSmartiePipelineConfig.write( szQueryLine )
         szFixedPart2 = \
     """           },
-            "blasr_mem" : "10G",
-            "processors" : """
+            "n_proc" : """
         fSmartiePipelineConfig.write( szFixedPart2 )
         fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-    szCommand = "module purge && module load modules modules-init modules-gs/prod modules-eichler/prod anaconda/201710 && module list && mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
+    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -V -cwd -j y -o ./log -l {cluster.h_rt} -l {cluster.mfree} -pe {cluster.pe} -q {cluster.q} -w n -S /bin/bash\" --verbose -p -k --rerun"
 
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
+
 
     # get the indel file from "variants"
 
@@ -433,6 +431,8 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
 
 # prepare to run freebayes on the problem locations of corrected1 genome
 # to get the problem locations, filter the smartie output
+
+print "\nprepare to run freebayes on the problem locations of corrected1 genome to get the problem locations, filter the smartie output\n"
 
 szRunFreebayesOnCorrection1Genome = "run_freebayes_on_corrected1_genome"
 
@@ -557,6 +557,8 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
 
 ########### run freebayes at pin-point locations in corrected genome 1 ############
 
+print "\nrun freebayes at pin-point locations in corrected genome 1\n"
+
 szFreebayesVCFOnCorrectedGenome1 = szCurrentDirectory + "/final/merged.vcf.gz"
 
 szRunFreebayesDoneFlag = "run_freebayes_done_flag"
@@ -617,7 +619,7 @@ os.chdir( ".." )
 
 
 ####################   create correctedGenome2.fa, our final genome ##########################
-
+print "\ncreate correctedGenome2.fa, our final genome\n"
 
 szCorrectedGenome2Dir = "freebayes_correction2"
 
@@ -666,9 +668,14 @@ if ( not os.path.isfile( szIndelCorrectedDoneFlag ) ):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "module load numpy/1.7.0 && module load biopython/1.63 &&  rename_sequences.py --szInputFasta almost_done.fa --szOutputFasta indel_corrected.fa"
+    szCommand = "module load python/2.7.3 && module load numpy/1.7.0 && module load biopython/1.63 &&  ./rename_sequences.py --szInputFasta almost_done.fa --szOutputFasta indel_corrected.fa"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
+
+    szCommand = "chmod a-w indel_corrected.fa"
+    print "about to execute: " + szCommand
+    subprocess.check_call( szCommand, shell = True )
+
 
     szCommand = "samtools faidx indel_corrected.fa"
     print "about to execute: " + szCommand
@@ -684,6 +691,7 @@ if ( not os.path.isfile( szIndelCorrectedDoneFlag ) ):
 
 ################   run smartie pipeline again to see how many gene-killing indels remain ##########################################################
 
+print "\nrun smartie pipeline again to see how many gene-killing indels remain\n"
 
 
 
@@ -699,26 +707,14 @@ if ( not os.path.isfile( szSmartieOnCorrectedGenome2Done ) ):
     print "chdir to "  + szSmartieOnCorrectedGenome2Subdirectory
 
 
-    szCommand = "cp ~dgordon/smartie/smartie.snake ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
-
-
-    szCommand = "cp ~dgordon/smartie/smartie-sv/pipeline/config.sh ."
-    print "about to execute: " + szCommand
-    subprocess.check_call( szCommand, shell = True )
-
-
-
     szSmartiePipelineConfigCorrectedGenome2 = "config.json"
 
     with open( szSmartiePipelineConfigCorrectedGenome2, "w" ) as fSmartiePipelineConfig:
         szFixedPart1 = \
     """\
     {
-            "install" :"/net/eichler/vol20/projects/whole_genome_assembly/nobackups/yoruban/fix_pilon/zev_pipe/smartie-sv",
             "targets" : {
-                      "hg38" : "/net/eichler/vol2/eee_shared/assemblies/hg38/indexes/blasr/ucsc.hg38.no_alts.fasta"
+                      "hg38" : "/net/eichler/vol26/eee_shared/assemblies/hg38/legacy/indexes/blasr/ucsc.hg38.no_alts.fasta"
                       },
             "queries" : {
     """
@@ -733,13 +729,12 @@ if ( not os.path.isfile( szSmartieOnCorrectedGenome2Done ) ):
         fSmartiePipelineConfig.write( szQueryLine )
         szFixedPart2 = \
     """           },
-            "blasr_mem" : "10G",
-            "processors" : """
+            "n_proc" : """
         fSmartiePipelineConfig.write( szFixedPart2 )
         fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-    szCommand = "module purge && module load modules modules-init modules-gs/prod modules-eichler/prod anaconda/201710 && module list && mkdir -p log && snakemake -j 22 --drmaa \" -q eichler-short.q -l h_rt=90:00:00 -V  {params.sge_opts} -cwd -e ./log -o ./log -S /bin/bash\" -s smartie.snake --verbose -p"
+    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -V -cwd -j y -o ./log -l {cluster.h_rt} -l {cluster.mfree} -pe {cluster.pe} -q {cluster.q} -w n -S /bin/bash\" --verbose -p -k --rerun"
 
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
@@ -756,7 +751,10 @@ if ( not os.path.isfile( szSmartieOnCorrectedGenome2Done ) ):
 # end run smartie pipeline again to see how many gene-killing indels remain
 ##########################################################################
 
+
+
 # now filter the smartie indels and see how many remain
+print "\nnow filter the smartie indels and see how many remain\n"
 
 szCorrected2GenomeCDS = "hg38-Correct2Genome.cds.bed"
 szCommand = "bedtools intersect -wa -u -a " + szSmartieIndelFileCorrectedGenome2 + " -b " + szHg38CDS + " >" + szCorrected2GenomeCDS
@@ -800,10 +798,20 @@ szRemainingIndelsCorrectedGenome2 = "pairs_of_indels_removed4.bed"
 
 assert os.path.isfile( szRemainingIndelsCorrectedGenome2 ), szRemainingIndelsCorrectedGenome2 + " must exist at this point but doesn't"
 
-print "number of filtered gene-killing indels:"
-szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2
-print "about to execute: " + szCommand
-subprocess.check_call( szCommand, shell = True )
+# this is now subsumed by /find_nongenekilling_indels4.py
+# print "number of filtered gene-killing indels:"
+# szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2
+# print "about to execute: " + szCommand
+# subprocess.check_call( szCommand, shell = True )
+
+# szCommand = "echo  \"number of filtered gene-killing indels:\" >gene_killing_indels.txt"
+# print "about to execute: " + szCommand
+# subprocess.check_call( szCommand, shell = True )
+
+# szCommand = "wc -l " + szRemainingIndelsCorrectedGenome2 + " >>gene_killing_indels.txt"
+# print "about to execute: " + szCommand
+# subprocess.check_call( szCommand, shell = True )
+
 
 
 
