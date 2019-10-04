@@ -260,23 +260,23 @@ if ( not os.path.exists( szDoneFlag ) ):
 
     os.chdir( szFreebayesCorrection1 )
 
-    szCommand = "gunzip -c " + szFreebayesOnInputGenomeFullPath + " | grep \"^#\" >header.txt"
+    szCommand = "set -eo pipefail && gunzip -c " + szFreebayesOnInputGenomeFullPath + " | grep \"^#\" >header.txt"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "gunzip -c " + szFreebayesOnInputGenomeFullPath + " | grep -v \"^#\" | awk '{ if ( length( $5 ) != length( $4 ) ) { {if ( ( $2 - x ) > " + str( nHowFarToLookForCorrelatedIndels ) + " ) print $0; } x = $2 } }' >body.txt"
+    szCommand = "set -eo pipefail && gunzip -c " + szFreebayesOnInputGenomeFullPath + " | grep -v \"^#\" | awk '{ if ( length( $5 ) != length( $4 ) ) { {if ( ( $2 - x ) > " + str( nHowFarToLookForCorrelatedIndels ) + " ) print $0; } x = $2 } }' >body.txt"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
 
     #szCurrentDirectory = os.getcwd()
 
-    szCommand = "module load tabix/0.2.6  && cat header.txt body.txt | bgzip -c >" + szFilteredFreebayes1VCF
+    szCommand = "set -eo pipefail && module load tabix/0.2.6  && cat header.txt body.txt | bgzip -c >" + szFilteredFreebayes1VCF
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
 
-    szCommand = "module load zlib/1.2.11 VCFtools/0.1.12b && module load tabix/0.2.6 && tabix " + szFilteredFreebayes1VCF + " && cat " + args.szInputGenome + " | vcf-consensus " + szFilteredFreebayes1VCF + " >" + szFreebayesCorrectedGenome1
+    szCommand = "set -eo pipefail && module load zlib/1.2.11 VCFtools/0.1.12b && module load tabix/0.2.6 && tabix " + szFilteredFreebayes1VCF + " && cat " + args.szInputGenome + " | vcf-consensus " + szFilteredFreebayes1VCF + " >" + szFreebayesCorrectedGenome1
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -477,7 +477,7 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
 
     szGeneKillingIndelsInCorrectedGenome1NoSegNoLowConfNoContigEndsNoSmallContigs = "indel.cds.noseg-nolowc-noends-nosmallcontigs.bed"
 
-    szCommand = "perl -lane 'print if $F[4] % 3 != 0' " + szCorrected1GenomeCDS + " | sort -k1,1 -k2,2n | bedtools subtract -A -a - -b " + szHg38LowConfidenceRegions + " | bedtools subtract -A -a - -b " + szHg38WgacSuperDup + " | perl -lane 'print if ($F[7] > " + str( nHowCloseToEnds ) +  " && ($F[9] - $F[7]) > " + str( nHowCloseToEnds ) + " && $F[9] > " + str( nMinimumSizeContig ) + " ) ' | sort -k1,1 -k2,2n > " + szGeneKillingIndelsInCorrectedGenome1NoSegNoLowConfNoContigEndsNoSmallContigs
+    szCommand = "set -eo pipefail && perl -lane 'print if $F[4] % 3 != 0' " + szCorrected1GenomeCDS + " | sort -k1,1 -k2,2n | bedtools subtract -A -a - -b " + szHg38LowConfidenceRegions + " | bedtools subtract -A -a - -b " + szHg38WgacSuperDup + " | perl -lane 'print if ($F[7] > " + str( nHowCloseToEnds ) +  " && ($F[9] - $F[7]) > " + str( nHowCloseToEnds ) + " && $F[9] > " + str( nMinimumSizeContig ) + " ) ' | sort -k1,1 -k2,2n > " + szGeneKillingIndelsInCorrectedGenome1NoSegNoLowConfNoContigEndsNoSmallContigs
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -543,7 +543,7 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
 
     szRunFreebayesInTheseRegions = "run_freebayes_in_these_regions.bed"
 
-    szCommand = "bedtools slop -b " + str( nRunFreebayesPlusMinusThisDistanceFromGenekillingIndels ) + " -g " + szFreebayesCorrectedGenome1Fai + " -i " + szRemainingIndelsCorrectedGenome1 + " | sort -k1,1 -k2,2n | bedtools merge -i stdin >" + szRunFreebayesInTheseRegions
+    szCommand = "set -eo pipefail && bedtools slop -b " + str( nRunFreebayesPlusMinusThisDistanceFromGenekillingIndels ) + " -g " + szFreebayesCorrectedGenome1Fai + " -i " + szRemainingIndelsCorrectedGenome1 + " | sort -k1,1 -k2,2n | bedtools merge -i stdin >" + szRunFreebayesInTheseRegions
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -643,7 +643,7 @@ if ( not os.path.isfile( szMakeCorrectedGenome2 ) ):
     # apply these indels to create correctedGenome2.fa  (In the future, should exclude snps.)
 
 
-    szCommand = "module load VCFtools/0.1.12b && module load tabix/0.2.6 && cat " + szFreebayesCorrectedGenome1 + " | vcf-consensus " + szFreebayesVCFOnCorrectedGenome1 + " >" + szCorrectedGenome2
+    szCommand = "set -eo pipefail && module load zlib/1.2.11 VCFtools/0.1.12b && module load tabix/0.2.6 && cat " + szFreebayesCorrectedGenome1 + " | vcf-consensus " + szFreebayesVCFOnCorrectedGenome1 + " >" + szCorrectedGenome2
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -763,14 +763,14 @@ subprocess.check_call( szCommand, shell = True )
 
 szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigs = "indel.cds.noseg-nolowc-noends-nosmallcontigs.bed"
 
-szCommand = "perl -lane 'print if $F[4] % 3 != 0' " + szCorrected2GenomeCDS + " | sort -k1,1 -k2,2n | bedtools subtract -A -a - -b " + szHg38LowConfidenceRegions + " | bedtools subtract -A -a - -b " + szHg38WgacSuperDup + " | perl -lane 'print if ($F[7] > " + str( nHowCloseToEnds ) + " && ($F[9] - $F[7]) > " + str( nHowCloseToEnds ) + " && $F[9] > " + str( nMinimumSizeContig ) + " ) ' | sort -k1,1 -k2,2n > " + szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigs
+szCommand = "set -eo pipefail && perl -lane 'print if $F[4] % 3 != 0' " + szCorrected2GenomeCDS + " | sort -k1,1 -k2,2n | bedtools subtract -A -a - -b " + szHg38LowConfidenceRegions + " | bedtools subtract -A -a - -b " + szHg38WgacSuperDup + " | perl -lane 'print if ($F[7] > " + str( nHowCloseToEnds ) + " && ($F[9] - $F[7]) > " + str( nHowCloseToEnds ) + " && $F[9] > " + str( nMinimumSizeContig ) + " ) ' | sort -k1,1 -k2,2n > " + szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigs
 print "about to execute: " + szCommand
 subprocess.check_call( szCommand, shell = True )
 
 szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigsFalconSpace = "indel.cds.noseg-nolowc-noends-nosmallcontigs.falconspace.bed"
 
 # convert to falcon coordinates:
-szCommand = "awk 'BEGIN {OFS = \"\t\" } {print $7,$8,$9,$0}' " + szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigs + " | sort -k1,1 -k2,2n >" +  szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigsFalconSpace
+szCommand = "set -eo pipefail && awk 'BEGIN {OFS = \"\t\" } {print $7,$8,$9,$0}' " + szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigs + " | sort -k1,1 -k2,2n >" +  szGeneKillingIndelsInCorrectedGenome2NoSegNoLowConfNoContigEndsNoSmallContigsFalconSpace
 print "about to execute: " + szCommand
 subprocess.check_call( szCommand, shell = True )
 
