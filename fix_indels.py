@@ -495,7 +495,7 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
     # convert high and low depth regions into coordinates of the 
     # freebayes_corrected1 genome
 
-    szCommand = "cp ~dgordon/pipelines/freebayes_polishing/convertCoordinates2.py ."
+    szCommand = "ln -s ../convertCoordinates2.py "
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -517,7 +517,7 @@ if ( not os.path.isfile( szWhereToRunFreebayesDoneFlag ) ):
     # remove neighboring events in which ins/del cancel each other or in which ins/ins or 
     # del/del sum to multiple of 3
 
-    szCommand = "cp ~dgordon/pipelines/freebayes_polishing/find_nongenekilling_indels4.py ."
+    szCommand = "ln -s ../find_nongenekilling_indels4.py"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -785,9 +785,9 @@ subprocess.check_call( szCommand, shell = True )
 # remove neighboring events in which ins/del cancel each other or in which ins/ins or 
 # del/del sum to multiple of 3
 
-szCommand = "cp ~dgordon/pipelines/freebayes_polishing/find_nongenekilling_indels4.py ."
-print "about to execute: " + szCommand
-subprocess.check_call( szCommand, shell = True )
+# szCommand = "cp ~dgordon/pipelines/freebayes_polishing/find_nongenekilling_indels4.py ."
+# print "about to execute: " + szCommand
+# subprocess.check_call( szCommand, shell = True )
 
 szCommand = "./find_nongenekilling_indels4.py"
 print "about to execute: " + szCommand
