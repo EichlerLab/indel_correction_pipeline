@@ -160,7 +160,7 @@ if ( not os.path.exists( szBwaVsInputGenomeDoneFlag )):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=4:00:00:00 -V -cwd -e ./log -o ./log {params.sge_opts} -S /bin/bash\" -w 300 --jobs 100 -p -k --rerun"
+    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -n w -q eichler-short.q -l h_rt=4:00:00:00 -V -cwd -e ./log -o ./log {params.sge_opts} -S /bin/bash\" -w 300 --jobs 100 -p -k --rerun"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -345,7 +345,7 @@ if ( not os.path.isfile( szAlignDoneFlag ) ):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p -k --rerun"
+    szCommand = "source source_this_first.sh && snakemake -s align_illumina_against_reference.snake --drmaa \" -n w -q eichler-short.q -l h_rt=35:00:00 -V -cwd -e ./log -o ./log {params.sge_opts}  -S /bin/bash\"  -w 300 --jobs 100 -p -k --rerun"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -408,7 +408,7 @@ if ( not os.path.isfile( szSmartie1DoneFlag ) ):
         fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -V -cwd -j y -o ./log -l {cluster.mfree} -pe {cluster.pe} -w n -S /bin/bash\" --verbose -p -k --rerun"
+    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -n w -V -cwd -j y -o ./log -l {cluster.h_rt} -l {cluster.mfree} -pe {cluster.pe} -q {cluster.q} -w n -S /bin/bash\" --verbose -p -k --rerun"
 
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
@@ -734,7 +734,7 @@ if ( not os.path.isfile( szSmartieOnCorrectedGenome2Done ) ):
         fSmartiePipelineConfig.write( "\"" + str( args.nProcessors ) + "\"\n}\n" )
 
 
-    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -V -cwd -j y -o ./log -l {cluster.mfree} -pe {cluster.pe} -w n -S /bin/bash\" --verbose -p -k --rerun"
+    szCommand = "SMARTIE_DIR=/net/eichler/vol26/7200/software/pipelines/smartie_sv/201909 && module purge && module load modules modules-init modules-gs/prod modules-eichler/prod miniconda/4.5.12 && module list && mkdir -p log && snakemake -s ${SMARTIE_DIR}/Snakefile -j 10  --jobname \"{rulename}.{jobid}\" --cluster-config ${SMARTIE_DIR}/cluster.config.sge.json --drmaa \" -n w -V -cwd -j y -o ./log -l {cluster.h_rt} -l {cluster.mfree} -pe {cluster.pe} -q {cluster.q} -w n -S /bin/bash\" --verbose -p -k --rerun"
 
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
