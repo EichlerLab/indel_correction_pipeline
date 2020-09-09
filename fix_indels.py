@@ -276,7 +276,7 @@ if ( not os.path.exists( szDoneFlag ) ):
     subprocess.check_call( szCommand, shell = True )
 
 
-    szCommand = "set -eo pipefail && module load zlib/1.2.11 VCFtools/0.1.12b && module load tabix/0.2.6 && tabix " + szFilteredFreebayes1VCF + " && cat " + args.szInputGenome + " | vcf-consensus " + szFilteredFreebayes1VCF + " >" + szFreebayesCorrectedGenome1
+    szCommand = "set -eo pipefail && module load zlib/1.2.11 vcftools/0.1.13 && module load tabix/0.2.6 && tabix " + szFilteredFreebayes1VCF + " && cat " + args.szInputGenome + " | vcf-consensus " + szFilteredFreebayes1VCF + " >" + szFreebayesCorrectedGenome1
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
