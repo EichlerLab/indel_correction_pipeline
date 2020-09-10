@@ -643,7 +643,7 @@ if ( not os.path.isfile( szMakeCorrectedGenome2 ) ):
     # apply these indels to create correctedGenome2.fa  (In the future, should exclude snps.)
 
 
-    szCommand = "set -eo pipefail && module load zlib/1.2.11 VCFtools/0.1.12b && module load tabix/0.2.6 && cat " + szFreebayesCorrectedGenome1 + " | vcf-consensus " + szFreebayesVCFOnCorrectedGenome1 + " >" + szCorrectedGenome2
+    szCommand = "set -eo pipefail && module load zlib/1.2.11 vcftools/0.1.13 && module load tabix/0.2.6 && cat " + szFreebayesCorrectedGenome1 + " | vcf-consensus " + szFreebayesVCFOnCorrectedGenome1 + " >" + szCorrectedGenome2
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
@@ -668,7 +668,7 @@ if ( not os.path.isfile( szIndelCorrectedDoneFlag ) ):
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
-    szCommand = "module load python/2.7.3 && module load numpy/1.7.0 && module load biopython/1.63 &&  ./rename_sequences.py --szInputFasta almost_done.fa --szOutputFasta indel_corrected.fa"
+    szCommand = "module load python/2.7.13 numpy/1.16.6 biopython/1.71 &&  ./rename_sequences.py --szInputFasta almost_done.fa --szOutputFasta indel_corrected.fa"
     print "about to execute: " + szCommand
     subprocess.check_call( szCommand, shell = True )
 
